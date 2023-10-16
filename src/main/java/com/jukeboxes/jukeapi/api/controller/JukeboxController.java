@@ -54,7 +54,9 @@ public class JukeboxController {
     @RequestParam(name = "offset", required = false) Integer offset,
     @RequestParam(name = "limit", required = false) Integer limit
   ) {
-    assert settingId != null: "Please enter a valid settinId";
+    if (settingId == null) {
+      throw new IllegalArgumentException("Please enter a valid settinId");
+    }
 
     // List of jukeboxes parsed from the JSON
     List<Jukebox> jukeList = jukeService.fetchJukeboxData();

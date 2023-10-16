@@ -5,6 +5,7 @@ import com.jukeboxes.jukeapi.Service.SettingService;
 import com.jukeboxes.jukeapi.api.model.*;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -16,16 +17,20 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,31 +38,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 class JukeboxControllerTest {
+
   @Autowired
   private JukeboxController jukeboxController;
 
   private MockMvc mockMvc;
-  private MockWebServer mockWebServerSetting;
-  private MockWebServer mockWebServerJuke;
+
+  //private MockWebServer mockWebServerSetting;
+  //private MockWebServer mockWebServerJuke;
 
 
 
-  @Autowired
+  @Mock
   private JukeService jukeService;
 
 
 
-  @Autowired
+  @Mock
   private SettingService settingService;
 
   @BeforeEach
-  void setUp() {
+  void setUp() throws IOException {
     MockitoAnnotations.openMocks(this);
     mockMvc = MockMvcBuilders.standaloneSetup(jukeboxController).build();
-  }
 
-  @Test
-  void testGetJukeboxes() throws Exception {
+    /*
     mockWebServerJuke = new MockWebServer();
     mockWebServerJuke.start();
     String baseUrlJuke = mockWebServerJuke.url("/").toString();
@@ -85,6 +90,18 @@ class JukeboxControllerTest {
       .setResponseCode(200)
       .setBody("[]");
     mockWebServerSetting.enqueue(mockResponse);
+    *
+     */
+  }
+/*
+  @AfterEach
+  void after() throws IOException {
+    mockWebServerSetting.shutdown();
+    mockWebServerJuke.shutdown();
+  }*/
+
+  @Test
+  void testGetJukeboxes() throws Exception {
 
     Assertions.assertEquals(4,
       Objects.requireNonNull(jukeboxController.getJukeboxes(
@@ -113,10 +130,86 @@ class JukeboxControllerTest {
         null,
         3,
         3).getBody()).getCurrentPage());
-
-    mockWebServerSetting.shutdown();
-    mockWebServerJuke.shutdown();
     // Add more assertions based on the response you expect
+  }
+
+  @Test
+  void testGetJukeboxesNoModelOffsetLimit() throws Exception {
+    ResponseEntity<Paginated<Jukebox>> response =
+      jukeboxController.getJukeboxes(
+        "\"86506865-f971-496e-9b90-75994f251459\"" +
+          "",
+        null,
+        null,
+        null);
+    Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+    // Add more assertions based on the response you expect
+  }
+
+  @Test
+  void testGetJukeboxesNoModel() throws Exception {
+    ResponseEntity<Paginated<Jukebox>> response =
+      jukeboxController.getJukeboxes(
+        "\"86506865-f971-496e-9b90-75994f251459\"",
+        null,
+        1,
+        3);
+    Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+    // Add more assertions based on the response you expect
+  }
+
+  @Test
+  void testGetJukeboxesNoOffset() throws Exception {
+    ResponseEntity<Paginated<Jukebox>> response =
+      jukeboxController.getJukeboxes(
+        "\"86506865-f971-496e-9b90-75994f251459\"",
+        "\"fusion\"",
+        null,
+        3);
+    Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+    // Add more assertions based on the response you expect
+  }
+
+  @Test
+  void testGetJukeboxesNoLimit() throws Exception {
+    ResponseEntity<Paginated<Jukebox>> response =
+      jukeboxController.getJukeboxes(
+        "\"86506865-f971-496e-9b90-75994f251459\"",
+        "\"fusion\"",
+        1,
+        null);
+    Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+    // Add more assertions based on the response you expect
+  }
+
+  @Test
+  void testGetJukeboxesInvalidSettingId() {
+    IllegalArgumentException exception =
+      assertThrows(IllegalArgumentException.class, () -> {
+      jukeboxController.getJukeboxes(
+        null,
+        null,
+        null,
+        null);
+    });
+    Assertions.assertEquals(
+      "Please enter a valid settinId",
+      exception.getMessage());
+  }
+
+  @Test
+  void testGetJukeboxesInvalidSettingIdInexistent() {
+    NoSuchElementException exception = assertThrows(
+      NoSuchElementException.class, () -> {
+      jukeboxController.getJukeboxes(
+        "invalidSettingId",
+        null,
+        null,
+        null);
+    });
+    Assertions.assertEquals(
+      "No matching setting found for settingId: invalidSettingId",
+      exception.getMessage());
   }
 
 }

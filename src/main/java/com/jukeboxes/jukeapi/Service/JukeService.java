@@ -64,10 +64,16 @@ public class JukeService {
   }
 
   private int calculateNumPages(int numItems, int limit) {
+    if (limit == 0) {
+      return 1;
+    }
     return (int) Math.ceil((double) numItems / limit);
   }
 
   private int calculateCurrentPage(int offset, int limit) {
+    if (limit == 0) {
+      return 1;
+    }
     return (offset / limit) + 1;
   }
 
