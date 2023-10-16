@@ -11,9 +11,6 @@ import org.springframework.core.SpringVersion;
 public class JukeapiApplication {
 
 	public static void main(String[] args) {
-
-		//System.out.println("Spring Version: " + SpringVersion.getVersion());
-		//Jukebox j1 = new Jukebox("1234", "fusion");
 		SpringApplication.run(JukeapiApplication.class, args);
 
 	}

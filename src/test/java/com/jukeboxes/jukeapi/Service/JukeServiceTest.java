@@ -1,122 +1,73 @@
-/*
 package com.jukeboxes.jukeapi.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jukeboxes.jukeapi.api.model.Component;
 import com.jukeboxes.jukeapi.api.model.Jukebox;
 import com.jukeboxes.jukeapi.api.model.Paginated;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(MockitoJUnitRunner.class)
-class JukeServiceTest {
+@SpringBootTest
+public class JukeServiceTest {
 
-  @Mock
+  @Autowired
   private JukeService jukeService;
 
+  private MockWebServer mockWebServer;
 
   @BeforeEach
-  void setUp() {
-    String jukeUrl = "https://my-json-server.typicode.com/touchtunes/tech-assignment/jukes";
+  public void setup() throws IOException {
+    mockWebServer = new MockWebServer();
+    mockWebServer.start();
+    String baseUrl = mockWebServer.url("/").toString();
+
+    // Configure WebClient to use the mock server URL
+    jukeService.setJukeUrl(baseUrl);
+
+    // Mock the server response
+    MockResponse mockResponse = new MockResponse()
+      .setResponseCode(200)
+      .setBody("[]");
+    mockWebServer.enqueue(mockResponse);
+  }
+
+  @AfterEach
+  public void tearDown() throws IOException {
+    mockWebServer.shutdown();
   }
 
   @Test
-  void fetchJukeboxData() {
+  public void fetchJukeboxDataTest() {
 
-    List<Jukebox> expectedJukeboxes = new ArrayList<>();
-    Jukebox j1 = new Jukebox("5ca94a8ac470d3e47cd4713c", "fusion");
-    j1.addComponent(new Component("led_panel"));
-    j1.addComponent(new Component("amplifier"));
-    j1.addComponent(new Component("led_panel"));
-    j1.addComponent(new Component("led_panel"));
-    j1.addComponent(new Component("pcb"));
-    expectedJukeboxes.add(j1);
+    List<Jukebox> jukeboxes = jukeService.fetchJukeboxData();
 
-    Jukebox j2 = new Jukebox("5ca94a8a77e20d15a7d16d0a", "angelina");
-    j1.addComponent(new Component("pcb"));
-    j1.addComponent(new Component("money_pcb"));
-    j1.addComponent(new Component("touchscreen"));
-    j1.addComponent(new Component("speaker"));
-    j1.addComponent(new Component("speaker"));
-    expectedJukeboxes.add(j2);
-
-
-    // Mock the data access behavior
-    when(jukeService.fetchJukeboxData()).thenReturn(expectedJukeboxes);
-
-    List<Jukebox> fetchedJukeboxes = jukeService.fetchJukeboxData();
-    List<Jukebox> actualJukeboxes = new ArrayList<>();
-    fetchedJukeboxes.add(fetchedJukeboxes.get(0));
-    fetchedJukeboxes.add(fetchedJukeboxes.get(1));
-
-
+    // Add assertions to verify jukeboxes
+    assertEquals(30, jukeboxes.size());
+    assertEquals("5ca94a8ac470d3e47cd4713c", jukeboxes.get(0).getId());
   }
 
   @Test
-  void paginate() {
+  public void paginateTest() {
+
+    List<Jukebox> jukeboxes = jukeService.fetchJukeboxData();
+    Paginated<Jukebox> paginatedJukes = jukeService.paginate(jukeboxes,2,3);
+
+    assertEquals(
+      "5ca94a8a75c231bb18715112",
+      paginatedJukes.getItems().get(0).getId());
+    assertEquals(3, paginatedJukes.getItems().size());
+    assertEquals(30, paginatedJukes.getNumItems());
+    assertEquals(10, paginatedJukes.getNumPages());
 
   }
+
+  // Add more test methods to cover other functionalities
 }
-
-
-/*
-[
-  {
-  "id": "5ca94a8ac470d3e47cd4713c",
-  "model": "fusion",
-  "components": [
-  {
-  "name": "led_panel"
-  },
-  {
-  "name": "amplifier"
-  },
-  {
-  "name": "led_panel"
-  },
-  {
-  "name": "led_panel"
-  },
-  {
-  "name": "pcb"
-  }
-  ]
-  },
-  {
-  "id": "5ca94a8a77e20d15a7d16d0a",
-  "model": "angelina",
-  "components": [
-  {
-  "name": "pcb"
-  },
-  {
-  "name": "money_pcb"
-  },
-  {
-  "name": "touchscreen"
-  },
-  {
-  "name": "speaker"
-  },
-  {
-  "name": "speaker"
-  }
-  ]
-  }
-  */
-

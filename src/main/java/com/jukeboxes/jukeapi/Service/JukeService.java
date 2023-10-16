@@ -20,11 +20,12 @@ import java.util.*;
 @Service
 public class JukeService {
 
+  private String jukeUrl = "http://my-json-server.typicode.com/touchtunes/tech-assignment/jukes";
   private final WebClient jukeWebClient;
   private final ObjectMapper objectMapper;
 
   public JukeService(WebClient.Builder webClientBuilder, ObjectMapper objectMapper) {
-    String jukeUrl = "http://my-json-server.typicode.com/touchtunes/tech-assignment/jukes";
+
     this.jukeWebClient = webClientBuilder.baseUrl(jukeUrl).build();
     this.objectMapper = objectMapper;
   }
@@ -35,6 +36,10 @@ public class JukeService {
       .bodyToMono(String.class)
       .flatMap(this::parseJukebox)
       .block();
+  }
+
+  public void setJukeUrl(String url) {
+    this.jukeUrl = url;
   }
 
   private Mono<List<Jukebox>> parseJukebox(String jsonResponse) {

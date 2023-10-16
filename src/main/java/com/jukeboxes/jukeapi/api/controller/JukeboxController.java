@@ -24,6 +24,22 @@ public class JukeboxController {
   private SettingService settingService;
 
 
+  /**
+   * @param settingId The Id of the setting containing the requirements
+   * that the jukeboxes must meet.
+   * @param model (optional)
+   *              Additional filter that requires the jukeboxes
+   *              to be of a certain model.
+   * @param offset (optional)
+   *               Starting index of the page (0 by default).
+   *
+   * @param limit (optional)
+   *              Maximum number of jukeboxes in a page
+   *              (total number of jukeboxes ny default)
+   * @return HTTP Response that holds a Paginated object containing
+   *         the paginated list, the total number of elements in the list,
+   *         the number of pages, and the number of the current page.
+   */
   @GetMapping("/api/jukeboxes")
   //HashMap<String, List<Jukebox>>
   public ResponseEntity<Paginated<Jukebox>> getJukeboxes (
@@ -77,7 +93,6 @@ public class JukeboxController {
     } catch (HttpClientErrorException.BadRequest e) {
       throw e;
     }
-
   }
 
 }

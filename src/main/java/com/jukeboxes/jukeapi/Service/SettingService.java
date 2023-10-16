@@ -21,7 +21,7 @@ public class SettingService {
   @Value("${api.url}")
   private String apiUrl;
    */
-  private final String settingsUrl = "http://my-json-server.typicode.com/touchtunes/tech-assignment/settings";
+  private String settingsUrl = "http://my-json-server.typicode.com/touchtunes/tech-assignment/settings";
 
   private final WebClient webClient;
   private final ObjectMapper objectMapper;
@@ -38,6 +38,11 @@ public class SettingService {
       .flatMap(this::parseSettings)
       .block();
   }
+
+  public void setJukeUrl(String url) {
+    this.settingsUrl = url;
+  }
+
 
   private Mono<SettingJSON> parseSettings(String jsonResponse) {
     try {
