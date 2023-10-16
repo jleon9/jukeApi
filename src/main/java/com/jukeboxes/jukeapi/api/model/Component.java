@@ -1,9 +1,5 @@
 package com.jukeboxes.jukeapi.api.model;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Component {
 

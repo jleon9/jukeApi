@@ -13,6 +13,9 @@ public class SettingJSON {
     this.settings = settings;
   }
 
+  /**
+   * @return The array of Setting objects contained in the JSON response
+   */
   public Setting[] getSettings() {
     return settings;
   }

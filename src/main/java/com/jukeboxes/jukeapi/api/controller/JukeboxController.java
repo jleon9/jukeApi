@@ -1,4 +1,5 @@
 package com.jukeboxes.jukeapi.api.controller;
+
 import com.jukeboxes.jukeapi.Service.JukeService;
 import com.jukeboxes.jukeapi.Service.SettingService;
 import com.jukeboxes.jukeapi.api.model.Jukebox;
@@ -10,9 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 public class JukeboxController {
@@ -24,12 +26,6 @@ public class JukeboxController {
   private SettingService settingService;
 
   public JukeboxController() {}
-
-  public JukeboxController(JukeService jukeService, SettingService settingService) {
-    this.jukeService = jukeService;
-    this.settingService = settingService;
-  }
-
 
   /**
    * @param settingId The Id of the setting containing the requirements
@@ -90,17 +86,8 @@ public class JukeboxController {
 
     Paginated<Jukebox> paginatedJukes = jukeService.paginate(filteredJukes, offset, limit);
 
-    // Returns a HashMap with settingId as a single key and its corresponding Jukeboxes that meet the requirements.
-    HashMap<String, List<Jukebox>> result = new HashMap<>();
-    result.put(settingId.substring(1, settingId.length() - 1), filteredJukes);
+    return ResponseEntity.status(HttpStatus.OK)
+      .body(paginatedJukes);
 
-
-    try {
-      return ResponseEntity.status(HttpStatus.OK)
-        .body(paginatedJukes);
-
-    } catch (HttpClientErrorException.BadRequest e) {
-      throw e;
-    }
   }
 }

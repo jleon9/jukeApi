@@ -1,7 +1,10 @@
 package com.jukeboxes.jukeapi.api.model;
-
-import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * Represents a paginated list with additional information about the paginated data.
+ * @param <T> Type of items in the paginated list.
+ */
 
 public class Paginated<T> {
   private List<T> items;

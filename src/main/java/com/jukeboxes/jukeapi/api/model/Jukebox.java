@@ -1,10 +1,9 @@
 package com.jukeboxes.jukeapi.api.model;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 public class Jukebox {
@@ -50,6 +49,10 @@ public class Jukebox {
     components.remove(c);
   }
 
+
+  /**
+   * @return The names of the Jukebox components
+   */
   @JsonIgnore
   public List<String> getJukeComponentNames() {
     List<String> jukeComponents = new ArrayList<>();

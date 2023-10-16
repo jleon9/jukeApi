@@ -1,12 +1,12 @@
 package com.jukeboxes.jukeapi;
 
-import com.jukeboxes.jukeapi.api.model.Jukebox;
-import org.apache.log4j.BasicConfigurator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.core.SpringVersion;
 
+/**
+ * The JukeApi Application
+ */
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
 public class JukeapiApplication {
 
