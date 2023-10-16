@@ -51,13 +51,15 @@ public class JukeService {
   }
 
   public Paginated<Jukebox> paginate(List<Jukebox> list, int offset, int limit) {
-    int end = Math.min(offset + limit, list.size());
+    int numItems = list.size();
+    int start = Math.min(offset, numItems);  // Ensure start is within bounds
+    int end = Math.min(offset + limit, numItems);  // Ensure end is within bounds
 
-    List<Jukebox> paginatedList = list.subList(offset, end);
+    List<Jukebox> paginatedList = list.subList(start, end);
     return new Paginated<>(
-      paginatedList, list.size(),
-      calculateNumPages(list.size(), limit),
-      calculateCurrentPage(offset,limit)
+      paginatedList, numItems,
+      calculateNumPages(numItems, limit),
+      calculateCurrentPage(start, limit)
     );
   }
 

@@ -39,7 +39,7 @@ public class SettingService {
       .block();
   }
 
-  public void setJukeUrl(String url) {
+  public void setSettingsUrl(String url) {
     this.settingsUrl = url;
   }
 

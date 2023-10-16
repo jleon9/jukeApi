@@ -1,8 +1,4 @@
 package com.jukeboxes.jukeapi.Service;
-
-import com.jukeboxes.jukeapi.api.model.Jukebox;
-import com.jukeboxes.jukeapi.api.model.Paginated;
-import com.jukeboxes.jukeapi.api.model.Setting;
 import com.jukeboxes.jukeapi.api.model.SettingJSON;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -32,7 +28,7 @@ public class SettingServiceTest {
     String baseUrl = mockWebServer.url("/").toString();
 
     // Configure WebClient to use the mock server URL
-    settingService.setJukeUrl(baseUrl);
+    settingService.setSettingsUrl(baseUrl);
 
     // Mock the server response
     MockResponse mockResponse = new MockResponse()

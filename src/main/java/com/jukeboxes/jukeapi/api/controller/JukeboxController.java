@@ -23,31 +23,38 @@ public class JukeboxController {
   @Autowired
   private SettingService settingService;
 
+  public JukeboxController() {}
+
+  public JukeboxController(JukeService jukeService, SettingService settingService) {
+    this.jukeService = jukeService;
+    this.settingService = settingService;
+  }
+
 
   /**
    * @param settingId The Id of the setting containing the requirements
-   * that the jukeboxes must meet.
-   * @param model (optional)
-   *              Additional filter that requires the jukeboxes
-   *              to be of a certain model.
-   * @param offset (optional)
-   *               Starting index of the page (0 by default).
-   *
-   * @param limit (optional)
-   *              Maximum number of jukeboxes in a page
-   *              (total number of jukeboxes ny default)
+   *                  that the jukeboxes must meet.
+   * @param model     (optional)
+   *                  Additional filter that requires the jukeboxes
+   *                  to be of a certain model.
+   * @param offset    (optional)
+   *                  Starting index of the page (0 by default).
+   * @param limit     (optional)
+   *                  Maximum number of jukeboxes in a page
+   *                  (total number of jukeboxes ny default)
    * @return HTTP Response that holds a Paginated object containing
-   *         the paginated list, the total number of elements in the list,
-   *         the number of pages, and the number of the current page.
+   * the paginated list, the total number of elements in the list,
+   * the number of pages, and the number of the current page.
    */
   @GetMapping("/api/jukeboxes")
   //HashMap<String, List<Jukebox>>
-  public ResponseEntity<Paginated<Jukebox>> getJukeboxes (
+  public ResponseEntity<Paginated<Jukebox>> getJukeboxes(
     @RequestParam(name = "settingId") String settingId,
     @RequestParam(name = "model", required = false) String model,
     @RequestParam(name = "offset", required = false) Integer offset,
     @RequestParam(name = "limit", required = false) Integer limit
   ) {
+    assert settingId != null: "Please enter a valid settinId";
 
     // List of jukeboxes parsed from the JSON
     List<Jukebox> jukeList = jukeService.fetchJukeboxData();
@@ -56,9 +63,9 @@ public class JukeboxController {
     Setting[] settingsArray = settingService.fetchSettingData().getSettings();
 
     // Setting object possibly returned that has the queried settingId
-    Setting queriedSetting = Arrays.stream(settingsArray)
-      .filter(setting -> ("\"" + setting.getId() + "\"").equals(settingId))
-      .findFirst().orElseThrow();
+      Setting queriedSetting = Arrays.stream(settingsArray)
+        .filter(setting -> ("\"" + setting.getId() + "\"").equals(settingId))
+        .findFirst().orElseThrow(() -> new NoSuchElementException("No matching setting found for settingId: " + settingId));
 
     // List of Jukeboxes that satisfy the setting's requirements
     List<Jukebox> filteredJukes = jukeList.stream()
@@ -83,7 +90,7 @@ public class JukeboxController {
 
     // Returns a HashMap with settingId as a single key and its corresponding Jukeboxes that meet the requirements.
     HashMap<String, List<Jukebox>> result = new HashMap<>();
-    result.put(settingId.substring(1,settingId.length()-1), filteredJukes);
+    result.put(settingId.substring(1, settingId.length() - 1), filteredJukes);
 
 
     try {
@@ -94,5 +101,4 @@ public class JukeboxController {
       throw e;
     }
   }
-
 }
